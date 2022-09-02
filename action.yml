@@ -16,7 +16,7 @@ inputs:
   snyk-token:
     required: false
     description: 'SNYK auth token'
-    default: ${{ secrets.SNYK_AUTH_TOKEN }}
+    default: ''
   version-major:
     required: false
     description: 'major version number'
