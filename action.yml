@@ -14,12 +14,20 @@ inputs:
     description: 'buildkitd flags to use'
     default: '--allow-insecure-entitlement network.host'
   build-args:
-    description: "List of build-time variables"
+    description: "list of build-time variables"
     required: false
   snyk-token:
     required: false
     description: 'SNYK auth token'
     default: ''
+  scan:
+    required: false
+    description: 'set to false to disable scan (default is true)'
+    default: 'true'
+  download-artifacts:
+    required: false
+    description: 'set to false to disable downloading artifacts'
+    default: 'true'
   version-major:
     required: false
     description: 'major version number'
@@ -39,11 +47,13 @@ runs:
       path: docker
   - name: Download ${{ inputs.name }} amd64 binary
     uses: actions/download-artifact@v3
+    if: ${{ success() && inputs.download-artifacts != false }}
     with:
       name: ${{ inputs.name }}_linux_amd64
       path: .build/linux-amd64
   - name: Download ${{ inputs.name }} arm64 docker
     uses: actions/download-artifact@v3
+    if: ${{ success() && inputs.download-artifacts != false }}
     with:
       name: ${{ inputs.name }}_linux_arm64
       path: .build/linux-arm64
@@ -64,6 +74,7 @@ runs:
       password: ${{ env.GITHUB_TOKEN }}
   - name: Build ${{ inputs.name }} container
     id: build
+    if: ${{ success() && inputs.scan != false }}
     uses: docker/build-push-action@v3
     with:
       context: .
@@ -76,6 +87,7 @@ runs:
       build-args: ${{ inputs.build-args }}
   - name: Scan ${{ inputs.name }} container
     uses: conventional-actions/docker-scan@v1
+    if: ${{ success() && inputs.scan != false }}
     with:
       file: docker/${{ inputs.name }}/Dockerfile
       image: ${{ steps.build.outputs.imageid }}
