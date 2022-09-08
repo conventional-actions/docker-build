@@ -16,6 +16,9 @@ inputs:
   build-args:
     description: "list of build-time variables"
     required: false
+  target:
+    description: "sets the target stage to build"
+    required: false
   snyk-token:
     required: false
     description: 'SNYK auth token'
@@ -82,6 +85,7 @@ runs:
       push: false
       load: true
       allow: network.host
+      target: ${{ inputs.target }}
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: ${{ inputs.build-args }}
@@ -111,6 +115,7 @@ runs:
       push: true
       load: false
       allow: network.host
+      target: ${{ inputs.target }}
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: ${{ inputs.build-args }}
