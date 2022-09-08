@@ -26,11 +26,11 @@ inputs:
   scan:
     required: false
     description: 'set to false to disable scan (default is true)'
-    default: 'true'
+    default: true
   download-artifacts:
     required: false
     description: 'set to false to disable downloading artifacts'
-    default: 'true'
+    default: true
   version-major:
     required: false
     description: 'major version number'
@@ -50,13 +50,13 @@ runs:
       path: docker
   - name: Download ${{ inputs.name }} amd64 binary
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts != false }}
+    if: inputs.download-artifacts
     with:
       name: ${{ inputs.name }}_linux_amd64
       path: .build/linux-amd64
   - name: Download ${{ inputs.name }} arm64 docker
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts != false }}
+    if: inputs.download-artifacts
     with:
       name: ${{ inputs.name }}_linux_arm64
       path: .build/linux-arm64
@@ -77,7 +77,7 @@ runs:
       password: ${{ env.GITHUB_TOKEN }}
   - name: Build ${{ inputs.name }} container
     id: build
-    if: ${{ success() && inputs.scan != false }}
+    if: inputs.scan
     uses: docker/build-push-action@v3
     with:
       context: .
