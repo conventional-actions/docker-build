@@ -4,7 +4,10 @@ author: 'Conventional Actions'
 inputs:
   name:
     required: false
-    description: 'name of binary/container'
+    description: 'name of container'
+  artifact:
+    required: false
+    description: 'name of the artifact if different from the container name'
   platforms:
     required: false
     description: 'comma-separated list of platforms to build'
@@ -50,15 +53,27 @@ runs:
       path: docker
   - name: Download ${{ inputs.name }} amd64 binary
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact == '' }}
     with:
       name: ${{ inputs.name }}_linux_amd64
       path: .build/linux-amd64
   - name: Download ${{ inputs.name }} arm64 docker
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact == '' }}
     with:
       name: ${{ inputs.name }}_linux_arm64
+      path: .build/linux-arm64
+  - name: Download ${{ inputs.artifact }} amd64 binary
+    uses: actions/download-artifact@v3
+    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact != '' }}
+    with:
+      name: ${{ inputs.artifact }}_linux_amd64
+      path: .build/linux-amd64
+  - name: Download ${{ inputs.artifact }} arm64 docker
+    uses: actions/download-artifact@v3
+    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact != '' }}
+    with:
+      name: ${{ inputs.artifact }}_linux_arm64
       path: .build/linux-arm64
   - name: Set up QEMU
     id: qemu
