@@ -12,8 +12,20 @@ To use the GitHub Action, add the following to your job:
 
 ### Inputs
 
-| Name          | Default        | Description                             |
-|---------------|----------------|-----------------------------------------|
+| Name               | Default                                     | Description                                               |
+|--------------------|---------------------------------------------|-----------------------------------------------------------|
+| name               |                                             | name of container                                         |
+| artifact           |                                             | name of the artifact if different from the container name |
+| platforms          | `linux/amd64,linux/arm64`                   | comma-separated list of platforms to build                |
+| buildkitd-flags    | `--allow-insecure-entitlement network.host` | buildkitd flags to use                                    |
+| build-args         |                                             | list of build-time variables                              |
+| target             |                                             | sets the target stage to build                            |
+| snyk-token         |                                             | SNYK auth token                                           |
+| scan               | `true`                                      | set to false to disable scan (default is true)            |
+| download-artifacts | `true`                                      | set to false to disable downloading artifacts             |
+| version-major      |                                             | major version number                                      |
+| version-minor      |                                             | minor version number                                      |
+| version-patch      |                                             | full path version number                                  |
 
 ### Outputs
 
