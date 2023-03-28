@@ -100,7 +100,7 @@ runs:
     uses: docker/build-push-action@v3
     with:
       context: .
-      file: ${{ steps.setup.output.dockerfile }}
+      file: ${{ steps.setup.outputs.dockerfile }}
       push: false
       load: true
       allow: network.host
@@ -112,7 +112,7 @@ runs:
     uses: conventional-actions/docker-scan@v1
     if: ${{ success() && inputs.scan == 'true' }}
     with:
-      file: ${{ steps.setup.output.dockerfile }}
+      file: ${{ steps.setup.outputs.dockerfile }}
       image: ${{ steps.build.outputs.imageid }}
       token: ${{ inputs.snyk-token }}
   - name: Metadata for ${{ inputs.name }}
@@ -130,7 +130,7 @@ runs:
     uses: docker/build-push-action@v3
     with:
       context: .
-      file: ${{ steps.setup.output.dockerfile }}
+      file: ${{ steps.setup.outputs.dockerfile }}
       push: true
       load: false
       allow: network.host
