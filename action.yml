@@ -114,7 +114,8 @@ runs:
     with:
       file: ${{ steps.setup.outputs.dockerfile }}
       image: ${{ steps.build.outputs.imageid }}
-      token: ${{ inputs.snyk-token }}
+    env:
+      SNYK_TOKEN: ${{ inputs.snyk-token }}
   - name: Metadata for ${{ inputs.name }}
     id: meta
     uses: docker/metadata-action@v4
