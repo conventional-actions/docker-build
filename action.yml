@@ -69,13 +69,13 @@ runs:
       path: docker
   - name: Download ${{ steps.setup.outputs.artifact }} amd64 binary
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'amd64') }}
     with:
       name: ${{ steps.setup.outputs.artifact }}_linux_amd64
       path: .build/linux-amd64
   - name: Download ${{ steps.setup.outputs.artifact }} arm64 docker
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'arm64') }}
     with:
       name: ${{ steps.setup.outputs.artifact }}_linux_arm64
       path: .build/linux-arm64
@@ -145,4 +145,3 @@ runs:
 branding:
   icon: anchor
   color: purple
-
