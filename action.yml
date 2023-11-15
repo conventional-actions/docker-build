@@ -5,6 +5,9 @@ inputs:
   name:
     required: false
     description: 'name of container'
+  dockerfile:
+    required: false
+    description: 'dockerfile path'
   artifact:
     required: false
     description: 'name of the artifact if different from the container name'
@@ -43,37 +46,42 @@ inputs:
   version-patch:
     required: false
     description: 'full path version number'
+  release-branch:
+    required: false
+    description: 'release branch name'
+    default: main
 runs:
   using: composite
   steps:
+  - id: setup
+    shell: bash
+    run: |
+      if [[ -z "${{ inputs.dockerfile }}" ]]; then
+        echo "dockerfile=docker/${{ inputs.name }}/Dockerfile" >> "$GITHUB_OUTPUT"
+      else
+        echo "dockerfile=${{ inputs.dockerfile }}" >> "$GITHUB_OUTPUT"
+      fi
+      if [[ -z "${{ inputs.artifact }}" ]]; then
+        echo "artifact=${{ inputs.name }}" >> "$GITHUB_OUTPUT"
+      else
+        echo "artifact=${{ inputs.artifact }}" >> "$GITHUB_OUTPUT"
+      fi
   - name: Download docker artifact
     uses: actions/download-artifact@v3
     with:
       name: docker
       path: docker
-  - name: Download ${{ inputs.name }} amd64 binary
+  - name: Download ${{ steps.setup.outputs.artifact }} amd64 binary
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact == '' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'amd64') }}
     with:
-      name: ${{ inputs.name }}_linux_amd64
+      name: ${{ steps.setup.outputs.artifact }}_linux_amd64
       path: .build/linux-amd64
-  - name: Download ${{ inputs.name }} arm64 docker
+  - name: Download ${{ steps.setup.outputs.artifact }} arm64 docker
     uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact == '' }}
+    if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'arm64') }}
     with:
-      name: ${{ inputs.name }}_linux_arm64
-      path: .build/linux-arm64
-  - name: Download ${{ inputs.artifact }} amd64 binary
-    uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact != '' }}
-    with:
-      name: ${{ inputs.artifact }}_linux_amd64
-      path: .build/linux-amd64
-  - name: Download ${{ inputs.artifact }} arm64 docker
-    uses: actions/download-artifact@v3
-    if: ${{ success() && inputs.download-artifacts == 'true' && inputs.artifact != '' }}
-    with:
-      name: ${{ inputs.artifact }}_linux_arm64
+      name: ${{ steps.setup.outputs.artifact }}_linux_arm64
       path: .build/linux-arm64
   - name: Set up QEMU
     id: qemu
@@ -96,7 +104,7 @@ runs:
     uses: docker/build-push-action@v4
     with:
       context: .
-      file: docker/${{ inputs.name }}/Dockerfile
+      file: ${{ steps.setup.outputs.dockerfile }}
       push: false
       load: true
       allow: network.host
@@ -108,9 +116,10 @@ runs:
     uses: conventional-actions/docker-scan@v1
     if: ${{ success() && inputs.scan == 'true' }}
     with:
-      file: docker/${{ inputs.name }}/Dockerfile
+      file: ${{ steps.setup.outputs.dockerfile }}
       image: ${{ steps.build.outputs.imageid }}
-      token: ${{ inputs.snyk-token }}
+    env:
+      SNYK_TOKEN: ${{ inputs.snyk-token }}
   - name: Metadata for ${{ inputs.name }}
     id: meta
     uses: docker/metadata-action@v4
@@ -126,7 +135,7 @@ runs:
     uses: docker/build-push-action@v4
     with:
       context: .
-      file: docker/${{ inputs.name }}/Dockerfile
+      file: ${{ steps.setup.outputs.dockerfile }}
       push: true
       load: false
       allow: network.host
