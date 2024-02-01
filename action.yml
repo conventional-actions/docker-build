@@ -115,7 +115,7 @@ runs:
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: ${{ inputs.build-args }}
-      secret-files: {{inputs.secret-files}}
+      secret-files: ${{inputs.secret-files}}
   - name: Scan ${{ inputs.name }} container
     uses: conventional-actions/docker-scan@v1
     if: ${{ success() && inputs.scan == 'true' }}
@@ -150,7 +150,7 @@ runs:
       platforms: ${{ inputs.platforms }}
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
-      secret-files: {{inputs.secret-files}}
+      secret-files: ${{inputs.secret-files}}
 branding:
   icon: anchor
   color: purple
