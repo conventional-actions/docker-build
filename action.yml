@@ -50,6 +50,9 @@ inputs:
     required: false
     description: 'release branch name'
     default: main
+  secret-files:
+    required: false
+    description: 'List of secret files to expose to the build (e.g., key=filename, MY_SECRET=./secret.txt)'
 runs:
   using: composite
   steps:
@@ -89,11 +92,11 @@ runs:
     with:
       platforms: ${{ inputs.platforms }}
   - name: Set up Docker Buildx
-    uses: docker/setup-buildx-action@v2
+    uses: docker/setup-buildx-action@v3
     with:
       buildkitd-flags: ${{ inputs.buildkitd-flags }}
   - name: Login to GitHub Container Registry
-    uses: docker/login-action@v2
+    uses: docker/login-action@v3
     with:
       registry: ghcr.io
       username: ${{ github.actor }}
@@ -112,6 +115,7 @@ runs:
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: ${{ inputs.build-args }}
+      secret-files: ${{inputs.secret-files}}
   - name: Scan ${{ inputs.name }} container
     uses: conventional-actions/docker-scan@v1
     if: ${{ success() && inputs.scan == 'true' }}
@@ -122,7 +126,7 @@ runs:
       SNYK_TOKEN: ${{ inputs.snyk-token }}
   - name: Metadata for ${{ inputs.name }}
     id: meta
-    uses: docker/metadata-action@v4
+    uses: docker/metadata-action@v5
     with:
       images: ghcr.io/${{ github.repository_owner }}/${{ inputs.name }}
       tags: |
@@ -146,6 +150,7 @@ runs:
       platforms: ${{ inputs.platforms }}
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
+      secret-files: ${{inputs.secret-files}}
 branding:
   icon: anchor
   color: purple
