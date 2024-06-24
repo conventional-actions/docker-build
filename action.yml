@@ -70,18 +70,18 @@ runs:
         echo "artifact=${{ inputs.artifact }}" >> "$GITHUB_OUTPUT"
       fi
   - name: Download docker artifact
-    uses: actions/download-artifact@v3
+    uses: actions/download-artifact@v4
     with:
       name: docker
       path: docker
   - name: Download ${{ steps.setup.outputs.artifact }} amd64 binary
-    uses: actions/download-artifact@v3
+    uses: actions/download-artifact@v4
     if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'amd64') }}
     with:
       name: ${{ steps.setup.outputs.artifact }}_linux_amd64
       path: .build/linux-amd64
   - name: Download ${{ steps.setup.outputs.artifact }} arm64 docker
-    uses: actions/download-artifact@v3
+    uses: actions/download-artifact@v4
     if: ${{ success() && inputs.download-artifacts == 'true' && contains(inputs.platforms, 'arm64') }}
     with:
       name: ${{ steps.setup.outputs.artifact }}_linux_arm64
