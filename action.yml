@@ -104,7 +104,7 @@ runs:
   - name: Build ${{ inputs.name }} container
     id: build
     if: ${{ success() && inputs.scan == 'true' }}
-    uses: docker/build-push-action@v5
+    uses: docker/build-push-action@v6
     with:
       context: .
       file: ${{ steps.setup.outputs.dockerfile }}
@@ -136,7 +136,7 @@ runs:
         type=raw,value=${{ inputs.version-patch }}
   - name: Push ${{ inputs.name }} container
     if: github.ref == format('refs/heads/{0}', inputs.release-branch)
-    uses: docker/build-push-action@v5
+    uses: docker/build-push-action@v6
     with:
       context: .
       file: ${{ steps.setup.outputs.dockerfile }}
